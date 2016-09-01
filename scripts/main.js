@@ -1,43 +1,42 @@
 $(document).ready(function () {
-    var map = L.map('map').setView([45.5017, -73.5673], 13);
+  vis = cartodb.createVis('map', 'https://anagraph.carto.com/api/v2/viz/bd20a288-5a7d-11e6-85cb-0e3ff518bd15/viz.json', {
+    // shareable: true,
+    // title: true,
+    // description: true,
+    // search: true,
+    // tiles_loader: true,
+    layer_selector: true,
+    center_lat: 45.5388,
+    center_lon: -73.6654,
+    zoom: 11,
+    no_cdn: true
+  })
+  .error(function(err) {
+    console.log(err);
+  }).done(function (vis,layers) {
+    var drawControl = new L.Control.Draw({
+      position: 'topright',
+      draw: {
+        polyline: false,
+        polygon: {
+          allowIntersection: false,
+          showArea: true,
+          drawError: {
+            color: '#b00b00',
+            timeout: 1000
+          },
+          shapeOptions: {
+            color: '#bada55'
+          }
+        },
+        circle: false,
+        marker: false
+      }
+    });
 
-	// create the tile layer with correct attribution
-	var osmUrl='http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
-	var osmAttrib='Map data © <a href="http://openstreetmap.org">OpenStreetMap</a> contributors';
-	var osm = new L.TileLayer(osmUrl, {minZoom: 8, maxZoom: 12, attribution: osmAttrib});
+     vis.getNativeMap().addControl(drawControl);
+  }
 
-	map.setView(new L.LatLng(45.5017, -73.5673),9);
-	map.addLayer(osm);
-
-
-// 	var layerUrl = 'http://documentation.carto.com/api/v2/viz/836e37ca-085a-11e4-8834-0edbca4b5057/viz.json';
-//
-//     var vizLayer = cartodb.createLayer(map, layerUrl);
-//     vizLayer.addTo(map)
-//     .on('done', function(layer) {
-//     }).on('error', function() {
-//         console.log(error);
-//     });
-//
-//     var accessToken = 'pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpandmbXliNDBjZWd2M2x6bDk3c2ZtOTkifQ._QA7i5Mpkd_m30IGElHziw';
-//     var mapboxAttribution = 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, ' +
-// 			'<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
-// 			'Imagery © <a href="http://mapbox.com">Mapbox</a>';
-// 	var mapboxUrl = 'https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token='+accessToken;
-//
-//     var grayscale = L.tileLayer(mapboxUrl, {id: 'MapID', attribution: mapboxAttribution});
-//     var streets   = L.tileLayer(mapboxUrl, {id: 'MapID', attribution: mapboxAttribution});
-//
-    var baseMaps = {
-        "Open Street Map": osm,
-//        "Grayscale": grayscale,
-//        "Streets": streets
-    };
-
-    var overlayMaps = {
-        //"Sample Carto Layer": vizLayer
-    };
-
-    L.control.layers(baseMaps, overlayMaps).addTo(map);
+  );
 
 });
