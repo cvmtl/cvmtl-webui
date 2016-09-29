@@ -1,3 +1,14 @@
+var treeIcon = L.ExtraMarkers.icon({
+    icon: 'fa-tree',
+    markerColor: 'green',
+    shape: 'circle',
+    prefix: 'fa'
+});
+
+function postMarker(marker) {
+  console.log(marker.getLatLng());
+}
+
 $(document).ready(function () {
 //  visurl = 'https://anagraph.carto.com/api/v2/viz/bd20a288-5a7d-11e6-85cb-0e3ff518bd15/viz.json';
   var visurl = 'https://thomasragot.carto.com/api/v2/viz/a616c578-856a-11e6-864f-0ecd1babdde5/viz.json';
@@ -25,12 +36,15 @@ $(document).ready(function () {
         polygon: false,
         circle: false,
         rectangle: false,
-        marker: true
+        marker: {
+          icon: treeIcon
+        }
       }
     });
     map.addControl(drawControl);
     map.on('draw:created', function (e) {
       map.addLayer(e.layer);
+      postMarker(e.layer);
     });
   });
 });
