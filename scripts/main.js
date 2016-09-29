@@ -5,6 +5,8 @@ var treeIcon = L.ExtraMarkers.icon({
     prefix: 'fa'
 });
 
+var markers = new Array();
+
 function postMarker(marker) {
   console.log(marker.getLatLng());
 }
@@ -29,6 +31,8 @@ $(document).ready(function () {
   })
   .done(function (vis,layers) {
     var map = vis.getNativeMap();
+    var drawnItems = new L.FeatureGroup();
+    map.addLayer(drawnItems);
     var drawControl = new L.Control.Draw({
       position: 'topright',
       draw: {
@@ -39,12 +43,20 @@ $(document).ready(function () {
         marker: {
           icon: treeIcon
         }
+      },
+      edit: {
+        featureGroup: drawnItems
       }
     });
     map.addControl(drawControl);
     map.on('draw:created', function (e) {
-      map.addLayer(e.layer);
+      drawnItems.addLayer(e.layer);
+      //map.addLayer(e.layer);
+
       postMarker(e.layer);
+    });
+    map.on('draw:drawstart', function (e) {
+      console.log('test draw start');
     });
   });
 });
