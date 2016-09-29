@@ -15,7 +15,22 @@ $(document).ready(function () {
   })
   .error(function(err) {
     console.log(err);
-  }).done(function (vis,layers) {
-    console.log('done');
+  })
+  .done(function (vis,layers) {
+    var map = vis.getNativeMap();
+    var drawControl = new L.Control.Draw({
+      position: 'topright',
+      draw: {
+        polyline: false,
+        polygon: false,
+        circle: false,
+        rectangle: false,
+        marker: true
+      }
+    });
+    map.addControl(drawControl);
+    map.on('draw:created', function (e) {
+      map.addLayer(e.layer);
+    });
   });
 });
