@@ -11,6 +11,11 @@ function postMarker(marker) {
   console.log(marker.getLatLng());
 }
 
+var drawnItems = new L.FeatureGroup();
+
+var styleEditor = L.control.styleEditor({
+    position: "topleft"
+});
 $(document).ready(function () {
 //  visurl = 'https://anagraph.carto.com/api/v2/viz/bd20a288-5a7d-11e6-85cb-0e3ff518bd15/viz.json';
   var visurl = 'https://thomasragot.carto.com/api/v2/viz/a616c578-856a-11e6-864f-0ecd1babdde5/viz.json';
@@ -31,8 +36,10 @@ $(document).ready(function () {
   })
   .done(function (vis,layers) {
     var map = vis.getNativeMap();
-    var drawnItems = new L.FeatureGroup();
+
     map.addLayer(drawnItems);
+    map.addControl(styleEditor);
+
     var drawControl = new L.Control.Draw({
       position: 'topright',
       draw: {
@@ -45,14 +52,15 @@ $(document).ready(function () {
         }
       },
       edit: {
-        featureGroup: drawnItems
+        featureGroup: drawnItems,
+        edit: false
       }
     });
     map.addControl(drawControl);
     map.on('draw:created', function (e) {
       drawnItems.addLayer(e.layer);
       //map.addLayer(e.layer);
-
+      console.log(drawnItems.getLayers());
       postMarker(e.layer);
     });
     map.on('draw:drawstart', function (e) {
