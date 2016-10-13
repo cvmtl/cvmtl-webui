@@ -1,1 +1,1 @@
-export const baseurl = 'http://localhost:7070/api/'
+export const baseurl = 'https://www.corridorsvertsmtl.org/api/'
