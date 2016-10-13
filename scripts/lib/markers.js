@@ -1,9 +1,10 @@
 const icon = require('./icon');
+const config = require('./config');
 export function addToMap(map) {
-  $.get( "http://localhost:7070/api/geo/markers", function( markers ) {
+  $.get( config.baseurl + "geo/markers", function( markers ) {
     for (var marker of markers) {
       var latlon = marker.latlon;
-      var options = { icon: icon.getIcon('tree', 'yellow') };
+      var options = { icon: icon.getIcon('tree', 'orange') };
       var result = L.marker(latlon, options).addTo(map);
       console.log(result);
     }
