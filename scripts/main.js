@@ -1,6 +1,7 @@
 const markers = require('./lib/markers');
 const draw = require('./lib/draw');
 const icon = require('./lib/icon');
+const config = require('./lib/config');
 draw.config();
 
 var drawnItems = new L.FeatureGroup();
@@ -20,9 +21,7 @@ var drawControl = new L.Control.Draw({
   }
 });
 $(document).ready(function () {
-//  visurl = 'https://anagraph.carto.com/api/v2/viz/bd20a288-5a7d-11e6-85cb-0e3ff518bd15/viz.json';
-  var visurl = 'https://thomasragot.carto.com/api/v2/viz/a616c578-856a-11e6-864f-0ecd1babdde5/viz.json';
-  cartodb.createVis('map', visurl , {
+  cartodb.createVis('map', config.cartoUrl , {
      shareable: false,
     // title: true,
      description: false,
