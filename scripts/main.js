@@ -1,4 +1,5 @@
 const markers = require('./lib/markers');
+const projects = require('./lib/projects');
 const draw = require('./lib/draw');
 const icon = require('./lib/icon');
 const config = require('./lib/config');
@@ -21,24 +22,13 @@ var drawControl = new L.Control.Draw({
   }
 });
 $(document).ready(function () {
-  cartodb.createVis('map', config.cartoUrl , {
-     shareable: false,
-    // title: true,
-     description: false,
-    search: false,
-    // tiles_loader: true,
-    layer_selector: false,
-    center_lat: 45.5388,
-    center_lon: -73.6654,
-    zoom: 11,
-    no_cdn: true
-  })
+  cartodb.createVis('map', config.carto.url , config.carto.parameters)
   .error(function(err) {
     console.log(err);
   })
   .done(function (vis,layers) {
     var map = vis.getNativeMap();
-    markers.addToMap(map);
+    projects.display(map);
     map.addLayer(drawnItems);
     map.addControl(drawControl);
     map.on('draw:created', function (e) {
