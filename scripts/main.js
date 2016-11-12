@@ -1,43 +1,40 @@
+const markers = require('./lib/markers');
+const projects = require('./lib/projects');
+const draw = require('./lib/draw');
+const icon = require('./lib/icon');
+const config = require('./lib/config');
+draw.config();
+
+var drawnItems = new L.FeatureGroup();
+var drawControl = new L.Control.Draw({
+  position: 'topright',
+  draw: {
+    polyline: false,
+    polygon: false,
+    circle: false,
+    rectangle: false,
+    marker: {
+      icon: icon.getIcon('tree', 'green')
+    }
+  },
+  edit: {
+    featureGroup: drawnItems
+  }
+});
 $(document).ready(function () {
-    var map = L.map('map').setView([45.5017, -73.5673], 13);
-
-	// create the tile layer with correct attribution
-	var osmUrl='http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
-	var osmAttrib='Map data © <a href="http://openstreetmap.org">OpenStreetMap</a> contributors';
-	var osm = new L.TileLayer(osmUrl, {minZoom: 8, maxZoom: 12, attribution: osmAttrib});
-
-	map.setView(new L.LatLng(45.5017, -73.5673),9);
-	map.addLayer(osm);
-
-
-// 	var layerUrl = 'http://documentation.carto.com/api/v2/viz/836e37ca-085a-11e4-8834-0edbca4b5057/viz.json';
-//
-//     var vizLayer = cartodb.createLayer(map, layerUrl);
-//     vizLayer.addTo(map)
-//     .on('done', function(layer) {
-//     }).on('error', function() {
-//         console.log(error);
-//     });
-//
-//     var accessToken = 'pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpandmbXliNDBjZWd2M2x6bDk3c2ZtOTkifQ._QA7i5Mpkd_m30IGElHziw';
-//     var mapboxAttribution = 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, ' +
-// 			'<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
-// 			'Imagery © <a href="http://mapbox.com">Mapbox</a>';
-// 	var mapboxUrl = 'https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token='+accessToken;
-//
-//     var grayscale = L.tileLayer(mapboxUrl, {id: 'MapID', attribution: mapboxAttribution});
-//     var streets   = L.tileLayer(mapboxUrl, {id: 'MapID', attribution: mapboxAttribution});
-//
-    var baseMaps = {
-        "Open Street Map": osm,
-//        "Grayscale": grayscale,
-//        "Streets": streets
-    };
-
-    var overlayMaps = {
-        //"Sample Carto Layer": vizLayer
-    };
-
-    L.control.layers(baseMaps, overlayMaps).addTo(map);
-
+  cartodb.createVis('map', config.carto.url , config.carto.parameters)
+  .error(function(err) {
+    console.log(err);
+  })
+  .done(function (vis,layers) {
+    var map = vis.getNativeMap();
+    projects.display(map);
+    map.addLayer(drawnItems);
+    map.addControl(drawControl);
+    map.on('draw:created', function (e) {
+      drawnItems.addLayer(e.layer);
+      map.addLayer(e.layer);
+      markers.postMarker(e);
+    });
+  });
 });

@@ -14,7 +14,12 @@
   ],
   "dependencies": {
     "cartodb.js": "^3.15.9",
-    "leaflet": "^0.7.7",
-    "jquery2": "^2.0.0"
+    "leaflet": "^1.0.0",
+    "leaflet-draw": "^0.4.0",
+    "Leaflet.label": "^0.2.1",
+    "Leaflet.extra-markers": "^1.0.6",
+    "jquery2": "^2.0.0",
+    "components-font-awesome": "^4.6.3",
+    "Leaflet.StyleEditor": "^0.1.6"
   }
 }
