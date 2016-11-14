@@ -6,9 +6,9 @@
 
    <meta charset=“utf-8” />
 
-   <script src="bundle/build.js"></script>
-   <link href='node_modules/mapbox-gl/dist/mapbox-gl.css' rel='stylesheet' />
-   <link rel="stylesheet" href="style/main.css">
+  <link rel="stylesheet" type="text/css" href="semantic/dist/semantic.min.css">
+  <link href='node_modules/mapbox-gl/dist/mapbox-gl.css' rel='stylesheet' />
+  <link rel="stylesheet" href="style/main.css">
 
 </head>
 
@@ -22,8 +22,24 @@
 
 </style>
 
-<div id="map"></div>
+<div class="ui visible left vertical menu sidebar">
+  <a class="item">
+    Item 1
+  </a>
+  <a class="item">
+    Item 2
+  </a>
+  <a class="item">
+    Item 3
+  </a>
+</div>
+<div class="pusher">
+  <div id="map"></div>
+</div>
 
+</div>
+<script src="semantic/dist/semantic.min.js"></script>
+<script src="bundle/build.js"></script>
 </body>
 
 </html>

@@ -5,7 +5,10 @@ var buffer = require('vinyl-buffer');
 var browserify = require('browserify');
 var watchify = require('watchify');
 var babel = require('babelify');
-
+// semantic ui
+var watchui = require('./semantic/tasks/watch'),
+  buildui = require('./semantic/tasks/build')
+;
 function compile(watch) {
   var bundler = watchify(browserify('./scripts/main.js', { debug: true }).transform(babel, {presets: ["es2015"]}));
 
@@ -35,5 +38,8 @@ function watch() {
 
 gulp.task('build', function() { return compile(); });
 gulp.task('watch', function() { return watch(); });
+
+gulp.task('watch_ui', watchui);
+gulp.task('build_ui', buildui);
 
 gulp.task('default', ['watch']);
