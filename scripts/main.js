@@ -1,40 +1,50 @@
-const markers = require('./lib/markers');
-const projects = require('./lib/projects');
-const draw = require('./lib/draw');
-const icon = require('./lib/icon');
+const $ = require('jquery');
 const config = require('./lib/config');
-draw.config();
-
-var drawnItems = new L.FeatureGroup();
-var drawControl = new L.Control.Draw({
-  position: 'topright',
-  draw: {
-    polyline: false,
-    polygon: false,
-    circle: false,
-    rectangle: false,
-    marker: {
-      icon: icon.getIcon('tree', 'green')
-    }
-  },
-  edit: {
-    featureGroup: drawnItems
-  }
-});
+const polylabel = require ('polylabel');
+const mapboxgl = require('mapbox-gl');
+const mapHelper = require ('./lib/map-helper.js')
 $(document).ready(function () {
-  cartodb.createVis('map', config.carto.url , config.carto.parameters)
-  .error(function(err) {
-    console.log(err);
-  })
-  .done(function (vis,layers) {
-    var map = vis.getNativeMap();
-    projects.display(map);
-    map.addLayer(drawnItems);
-    map.addControl(drawControl);
-    map.on('draw:created', function (e) {
-      drawnItems.addLayer(e.layer);
-      map.addLayer(e.layer);
-      markers.postMarker(e);
-    });
+  mapboxgl.accessToken = config.mapbox.token;
+  var map = new mapboxgl.Map({
+      container: 'map',
+      style: config.mapbox.style,
+     zoom: config.baseZoom,
+     center: [config.centerLat, config.centerLng]
   });
+  var getAllUrl = config.apiBaseUrl + "projects?type=geojson";
+  var getAllUrl = "http://localhost:8080/projects.json";
+  map.on('load', function () {
+    $.get( getAllUrl, function( items ) {
+      mapHelper.addCorridors(map,items);
+    }).done(function (items) {
+          console.log(items);
+    })
+    // Create a popup, but don't add it to the map yet.
+    var popup = new mapboxgl.Popup({
+        closeButton: false,
+        closeOnClick: false
+    });
+
+    map.on('mousemove', function(e) {
+        var features = map.queryRenderedFeatures(e.point, { layers: ['corridors'] });
+        // Change the cursor style as a UI indicator.
+        map.getCanvas().style.cursor = (features.length) ? 'pointer' : '';
+
+        if (!features.length) {
+            popup.remove();
+            return;
+        }
+
+        var feature = features[0];
+        // Populate the popup and set its coordinates
+        // based on the feature found.
+
+        popup.setLngLat(polylabel(feature.geometry.coordinates))
+           .setHTML(feature.properties.description)
+            .addTo(map);
+        map.setPaintProperty('corridors', 'fill-opacity', 1);
+    });
+
+
+});
 });

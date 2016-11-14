@@ -6,26 +6,21 @@
 
    <meta charset=“utf-8” />
 
-   <script src="bower_components/jquery2/jquery.min.js"></script>
-   <script src="bower_components/cartodb.js/cartodb.js"></script>
-   <script src="bower_components/leaflet-draw/dist/leaflet.draw.js"></script>
-   <script src="bower_components/Leaflet.label/dist/leaflet.label.js"></script>
-   <script src="bower_components/Leaflet.extra-markers/src/assets/js/leaflet.extra-markers.js"></script>
-   <script src="bower_components/Leaflet.StyleEditor/dist/javascript/Leaflet.StyleEditor.min.js"></script>
-
    <script src="bundle/build.js"></script>
-
-   <link rel="stylesheet" href="bower_components/leaflet-draw/dist/leaflet.draw.css">
-   <link rel="stylesheet" href="bower_components/Leaflet.label/dist/leaflet.label.css">
-   <link rel="stylesheet" href="bower_components/components-font-awesome/css/font-awesome.css">
-   <link rel="stylesheet" href="bower_components/Leaflet.extra-markers/dist/css/leaflet.extra-markers.min.css">
-   <link rel="stylesheet" href="bower_components/Leaflet.StyleEditor/dist/css/Leaflet.StyleEditor.min.css">
-   <link rel="stylesheet" href="bower_components/cartodb.js/themes/css/cartodb.css">
+   <link href='node_modules/mapbox-gl/dist/mapbox-gl.css' rel='stylesheet' />
    <link rel="stylesheet" href="style/main.css">
 
 </head>
 
 <body>
+<style>
+
+.mapboxgl-popup {
+    max-width: 400px;
+    font: 12px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
+}
+
+</style>
 
 <div id="map"></div>
 
