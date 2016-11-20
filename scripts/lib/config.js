@@ -1,3 +1,4 @@
+export const devMode = false;
 export const baseZoom = 9;
 export const centerLat = -73.6654;
 export const centerLng = 45.5388;
