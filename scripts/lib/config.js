@@ -1,4 +1,4 @@
-export const baseZoom = 11;
+export const baseZoom = 9;
 export const centerLat = -73.6654;
 export const centerLng = 45.5388;
 export const mapbox = {
