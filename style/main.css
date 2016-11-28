@@ -2,3 +2,19 @@
   width: 100%;
   height: 1000px;
 }
+@media all and (max-width:800px) {
+  #sidebar{
+      display:none;
+    }
+    #mapcontainer {
+      -webkit-transform: initial;
+      transform: initial;
+    }
+}
+
+/*fails to fix sidebar sidebar showing @width>=631px*/
+@media all and (min-width:801px) {
+  #sidebar{
+      display:block;
+    }
+}
