@@ -39,7 +39,7 @@ $(document).ready(function () {
         $('.menu').append(
           '<a class="item" related='+ relatedId +
           '>' +
-          item.properties.description+'</a>')
+          item.properties.title+'</a>')
         }
     })
     .done(function (items) {
