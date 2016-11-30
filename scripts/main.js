@@ -66,7 +66,7 @@ $(document).ready(function () {
         }
         var feature = features[0];
         popup.setLngLat(polylabel(feature.geometry.coordinates))
-           .setHTML(feature.properties.description)
+           .setHTML(feature.properties.title)
             .addTo(map);
     });
 
@@ -77,7 +77,7 @@ $(document).ready(function () {
             return;
         }
         var feature = features[0];
-        var testresult = $('.ui.modal .header').html(feature.properties.description);
+        var testresult = $('.ui.modal .header').html(feature.properties.title);
         console.log(testresult);
         $('.ui.modal').modal({
           inverted: true
