@@ -12,6 +12,7 @@ $.fn.transition = Transition;
 $.fn.modal = Modal;
 
 $(document).ready(function () {
+  console.log('version 10');
 
   mapboxgl.accessToken = config.mapbox.token;
   var map = new mapboxgl.Map({
@@ -52,26 +53,21 @@ $(document).ready(function () {
                 center: p,
                  zoom: 12
             });
+            console.log(item.geometry.coordinates[0][0]);
+            mapHelper.hoverCorridor(map, item, popup);
+            //var features = map.queryRenderedFeatures(e.point, { layers: ['corridors'] });
           });
     })
 
     map.on('mousemove', function(e) {
-        var features = map.queryRenderedFeatures(e.point, { layers: ['corridors'] });
-        // Change the cursor style as a UI indicator.
-        map.getCanvas().style.cursor = (features.length) ? 'pointer' : '';
-
-        if (!features.length) {
-            popup.remove();
-            return;
-        }
-        var feature = features[0];
-        popup.setLngLat(polylabel(feature.geometry.coordinates))
-           .setHTML(feature.properties.title)
-            .addTo(map);
+      var features = map.queryRenderedFeatures(e.point, { layers: ['corridors'] });
+      mapHelper.toggleHoverCorridor(map, features, popup);
     });
 
+    map.on("mouseout", function() {
+        map.setFilter("corridors-hover", ["==", "title", ""]);
+    });
     map.on('click', function(e) {
-        console.log('click');
         var features = map.queryRenderedFeatures(e.point, { layers: ['corridors'] });
         if (!features.length) {
             return;

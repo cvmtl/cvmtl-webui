@@ -9,7 +9,7 @@ export const mapbox = {
 export const apiBaseUrl = 'https://www.corridorsvertsmtl.org/api/'
 export const style =
 {
-    "color": "green",
-    "weight": 1,
-    "opacity": 1
+    // 'fill-outline-color': 'black',
+    // "weight": 1,
+    // "opacity": 1
 }
