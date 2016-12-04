@@ -22,7 +22,7 @@ export function addCorridors(map, items) {
     'paint': {
         'fill-color': '#367133',
         'fill-outline-color': '#053e0e',
-        'fill-opacity': 0.1
+        'fill-opacity': 0
     }
   });
 
@@ -33,7 +33,7 @@ export function addCorridors(map, items) {
     "layout": {},
     "paint": {
          "line-color": "#053e0e",
-         "line-width": 2
+         "line-width": 1
      }
   });
 
@@ -45,7 +45,7 @@ export function addCorridors(map, items) {
     'paint': {
         'fill-color': '#367133',
         'fill-outline-color': 'black',
-        'fill-opacity': 0.8
+        'fill-opacity': 0.2
 
     },
     "filter": ["==", "title", ""]
@@ -63,10 +63,11 @@ export function toggleHoverCorridor(map, features, popup){
   // Change the cursor style as a UI indicator.
   map.getCanvas().style.cursor = (features.length) ? 'pointer' : '';
   var feature = features[0];
+
   if (!features.length) {
       popup.remove();
       map.setFilter("corridors-hover", ["==", "title", ""]);
       return;
   }
-  hoverCorridor(map, feature, popup);
+  hoverCorridor(map, feature, popup)
 }
