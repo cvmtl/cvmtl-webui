@@ -3,6 +3,7 @@ const config = require('./lib/config');
 const polylabel = require ('polylabel');
 const mapboxgl = require('mapbox-gl');
 const mapHelper = require ('./lib/map-helper.js');
+const fullscreen = require ('./lib/fullscreen.js');
 const Modal = require('semantic-ui-modal');
 const Transition = require('semantic-ui-transition');
 const  Dimmer = require('semantic-ui-dimmer');
@@ -129,5 +130,10 @@ $(document).ready(function () {
     }).done(function (items) {
 
     });
+  });
+
+  fullscreen.initEventHandling();
+  $('#gofullscreen').on('click', function () {
+      fullscreen.toggleFullScreen($('body')[0]);
   });
 });
