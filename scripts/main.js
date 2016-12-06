@@ -12,7 +12,7 @@ $.fn.transition = Transition;
 $.fn.modal = Modal;
 
 $(document).ready(function () {
-
+  console.log('version 75');
   mapboxgl.accessToken = config.mapbox.token;
   var map = new mapboxgl.Map({
       container: 'map',
@@ -20,6 +20,7 @@ $(document).ready(function () {
      zoom: config.baseZoom,
      center: [config.centerLat, config.centerLng]
   });
+  map.addControl(new mapboxgl.NavigationControl(), ['top-left']);
 
   var getAllUrl = config.apiBaseUrl + "projects?type=geojson";
   if (config.devMode) {
@@ -32,60 +33,82 @@ $(document).ready(function () {
         closeOnClick: false
     });
     $.get( getAllUrl, function( items ) {
-      mapHelper.addCorridors(map,items);
-      for(var item of items){
-        var menuId = "item-"+ item.properties.id;
-        var relatedId = item.properties.id - 1
-        $('.menu').append(
-          '<a class="item" related='+ relatedId +
-          '>' +
-          item.properties.title+'</a>')
+      $.get('https://corridorsvertsmtl.org/wp-json/wp/v2/projet', function (projects) {
+        console.log(projects);
+        for (let project of projects){
+          for (let item of items){
+            if (project.acf.shortname == item.properties.shortname){
+              item.properties.title = project.acf['nom'];
+              item.properties.goal = project.acf['objectif'];
+              item.properties.facebook = project.acf['page_facebook'];
+              item.properties.website = project.acf['website'];
+              item.properties.details = project.link;
+            }
+          }
         }
-    })
-    .done(function (items) {
-          console.log('chargement ok');
-          $('.item').on('click', function(){
-            var itemId = $(this).attr('related');
-            var item = items[itemId];
-            var p = polylabel(item.geometry.coordinates);
-            map.flyTo({
-                center: p,
-                 zoom: 12
-            });
+        mapHelper.addCorridors(map,items);
+        for(var item of items){
+          var menuId = "item-"+ item.properties.id;
+          var relatedId = item.properties.id - 1
+          $('.menu').append(
+            '<a class="item" related='+ relatedId +
+            '>' +
+            item.properties.title+'</a>')
+        }
+        $('.item').on('click', function(){
+          var itemId = $(this).attr('related');
+          var item = items[itemId];
+          var p = polylabel(item.geometry.coordinates);
+          map.flyTo({
+              center: p,
+               zoom: 12
           });
-    })
+          mapHelper.hoverCorridor(map, item, popup);
+        });
+        map.on('mousemove', function(e) {
+          var features = map.queryRenderedFeatures(e.point, { layers: ['corridors'] });
+          mapHelper.toggleHoverCorridor(map, features, popup);
+        });
 
-    map.on('mousemove', function(e) {
-        var features = map.queryRenderedFeatures(e.point, { layers: ['corridors'] });
-        // Change the cursor style as a UI indicator.
-        map.getCanvas().style.cursor = (features.length) ? 'pointer' : '';
+        map.on("mouseout", function() {
+            map.setFilter("corridors-hover", ["==", "title", ""]);
+        });
+        map.on('click', function(e) {
+            var features = map.queryRenderedFeatures(e.point, { layers: ['corridors'] });
+            if (!features.length) {
+                return;
+            }
+            var feature = features[0];
 
-        if (!features.length) {
-            popup.remove();
-            return;
-        }
-        var feature = features[0];
-        popup.setLngLat(polylabel(feature.geometry.coordinates))
-           .setHTML(feature.properties.description)
-            .addTo(map);
+            $('.ui.modal .header #title').html(feature.properties.title);
+            $(".ui.modal .content #description").html(feature.properties.goal);
+            $('.ui.modal .content #details-link').attr('href', feature.properties.details);
+console.log(feature.properties.facebook);
+            if (typeof(feature.properties.facebook) !== 'undefined' && feature.properties.facebook !='') {
+              $('.ui.modal .content #facebook-link').attr('href', feature.properties.facebook);
+              $('.ui.modal .content #facebook-link').show();
+            }
+            else {
+              $('.ui.modal .content #facebook-link').hide();
+            }
+console.log(feature.properties.facebook);
+            if (typeof(feature.properties.website) !== 'undefined' && feature.properties.website !='') {
+              $('.ui.modal .content #website-link').attr('href', feature.properties.website);
+              $('.ui.modal .content #website-link').show();
+            }
+            else {
+              $('.ui.modal .content #website-link').hide();
+            }
+            $('.ui.modal').modal({
+              inverted: true
+            })
+            .modal('show');
+        });
+      }).done(function (items) {
+
+      })
+    }).done(function (items) {
+
     });
-
-    map.on('click', function(e) {
-        console.log('click');
-        var features = map.queryRenderedFeatures(e.point, { layers: ['corridors'] });
-        if (!features.length) {
-            return;
-        }
-        var feature = features[0];
-        var testresult = $('.ui.modal .header').html(feature.properties.description);
-        console.log(testresult);
-        $('.ui.modal').modal({
-          inverted: true
-        })
-        .modal('show');
-    });
-
-
   });
-
 });
