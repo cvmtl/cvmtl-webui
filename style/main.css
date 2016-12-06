@@ -1,7 +1,33 @@
 #map {
-  width: 100%;
-  height: 600px;
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
 }
+
+#mapcontainer {
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    left: 260px;
+}
+
+body .ui.visible.left.sidebar~.fixed, 
+body .ui.visible.left.sidebar~.pusher {
+   -webkit-transform: translate3d(0,0,0);
+   transform: translate3d(0,0,0);
+}
+
+.fullscreen #gofullscreen {
+    display: none;
+}
+
+#gofullscreen {
+    margin: 15px;
+}
+
 @media all and (max-width:800px) {
   #sidebar{
       display:none;
