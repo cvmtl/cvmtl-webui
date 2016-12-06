@@ -12,7 +12,7 @@ $.fn.transition = Transition;
 $.fn.modal = Modal;
 
 $(document).ready(function () {
-  console.log('version 74');
+  console.log('version 75');
   mapboxgl.accessToken = config.mapbox.token;
   var map = new mapboxgl.Map({
       container: 'map',
@@ -38,9 +38,11 @@ $(document).ready(function () {
         for (let project of projects){
           for (let item of items){
             if (project.acf.shortname == item.properties.shortname){
+              item.properties.title = project.acf['nom'];
               item.properties.goal = project.acf['objectif'];
               item.properties.facebook = project.acf['page_facebook'];
               item.properties.website = project.acf['website'];
+              item.properties.details = project.link;
             }
           }
         }
@@ -77,24 +79,26 @@ $(document).ready(function () {
                 return;
             }
             var feature = features[0];
-            console.log(feature.properties);
+
             $('.ui.modal .header #title').html(feature.properties.title);
-            if (typeof(feature.properties.facebook) !== 'undefined') {
+            $(".ui.modal .content #description").html(feature.properties.goal);
+            $('.ui.modal .content #details-link').attr('href', feature.properties.details);
+console.log(feature.properties.facebook);
+            if (typeof(feature.properties.facebook) !== 'undefined' && feature.properties.facebook !='') {
               $('.ui.modal .content #facebook-link').attr('href', feature.properties.facebook);
               $('.ui.modal .content #facebook-link').show();
             }
             else {
               $('.ui.modal .content #facebook-link').hide();
             }
-            if (typeof(feature.properties.website) !== 'undefined') {
+console.log(feature.properties.facebook);
+            if (typeof(feature.properties.website) !== 'undefined' && feature.properties.website !='') {
               $('.ui.modal .content #website-link').attr('href', feature.properties.website);
               $('.ui.modal .content #website-link').show();
             }
             else {
               $('.ui.modal .content #website-link').hide();
             }
-            // $('.ui.modal .header #facebook-link').attr('href', feature.properties.facebook);
-            $(".ui.modal .content #description").html(feature.properties.goal);
             $('.ui.modal').modal({
               inverted: true
             })
