@@ -11,6 +11,28 @@ $.fn.dimmer = Dimmer;
 $.fn.transition = Transition;
 $.fn.modal = Modal;
 
+/**
+ * Sort the projects, such that the 'territories
+ * are first in the list. This is done, to ensure
+ * the smaller areas appear in front of the
+ * larger areas, so hover works as expected.
+ */
+function sortProjects(projects) {
+  projects = projects.sort(function (objA, objB) {
+      if (objA.properties.category && objB.properties.category) {
+          var categoryA = objA.properties.category;
+          var categoryB = objB.properties.category;
+          if (categoryA === 'corridor' && categoryB !== 'corridor') {
+              return 1;
+          } else if (categoryB === 'corridor' && categoryA !== 'corridor') {
+              return -1;
+          }
+      }
+      return 0;
+  });
+  return projects;
+}
+
 $(document).ready(function () {
 
   mapboxgl.accessToken = config.mapbox.token;
@@ -31,6 +53,8 @@ $(document).ready(function () {
     });
     $.get( getAllUrl, function( items ) {
       $.get('https://corridorsvertsmtl.org/wp-json/wp/v2/projet', function (projects) {
+        var i;
+        items = sortProjects(items);
         for (let project of projects){
           for (let item of items){
             if (project.acf.shortname == item.properties.shortname){
@@ -42,14 +66,15 @@ $(document).ready(function () {
             }
           }
         }
-        mapHelper.addCorridors(map,items);
-        for(var item of items){
-          var menuId = "item-"+ item.properties.id;
-          var relatedId = item.properties.id - 1
+        mapHelper.addCorridors(map, items);
+
+        for (i=0; i < items.length; i++) {
+          const menuId = "item-"+ items[i].properties.id;
+          const relatedId = i;
+          const category = items[i].properties.category;
           $('.menu').append(
-            '<a class="item" related='+ relatedId +
-            '>' +
-            item.properties.title+'</a>')
+            `<a class="item ${category}" related="${relatedId}">${items[i].properties.title}</a>`
+            );
         }
         $('.item').on('click', function(){
           var itemId = $(this).attr('related');
