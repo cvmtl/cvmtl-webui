@@ -12,7 +12,7 @@ $.fn.transition = Transition;
 $.fn.modal = Modal;
 
 $(document).ready(function () {
-  console.log('version 75');
+
   mapboxgl.accessToken = config.mapbox.token;
   var map = new mapboxgl.Map({
       container: 'map',
@@ -23,9 +23,6 @@ $(document).ready(function () {
   map.addControl(new mapboxgl.NavigationControl(), ['top-left']);
 
   var getAllUrl = config.apiBaseUrl + "projects?type=geojson";
-  if (config.devMode) {
-    var getAllUrl = "projects.json";
-  }
 
   map.on('load', function () {
     var popup = new mapboxgl.Popup({
@@ -34,7 +31,6 @@ $(document).ready(function () {
     });
     $.get( getAllUrl, function( items ) {
       $.get('https://corridorsvertsmtl.org/wp-json/wp/v2/projet', function (projects) {
-        console.log(projects);
         for (let project of projects){
           for (let item of items){
             if (project.acf.shortname == item.properties.shortname){
@@ -83,7 +79,6 @@ $(document).ready(function () {
             $('.ui.modal .header #title').html(feature.properties.title);
             $(".ui.modal .content #description").html(feature.properties.goal);
             $('.ui.modal .content #details-link').attr('href', feature.properties.details);
-console.log(feature.properties.facebook);
             if (typeof(feature.properties.facebook) !== 'undefined' && feature.properties.facebook !='') {
               $('.ui.modal .content #facebook-link').attr('href', feature.properties.facebook);
               $('.ui.modal .content #facebook-link').show();
@@ -91,7 +86,6 @@ console.log(feature.properties.facebook);
             else {
               $('.ui.modal .content #facebook-link').hide();
             }
-console.log(feature.properties.facebook);
             if (typeof(feature.properties.website) !== 'undefined' && feature.properties.website !='') {
               $('.ui.modal .content #website-link').attr('href', feature.properties.website);
               $('.ui.modal .content #website-link').show();
