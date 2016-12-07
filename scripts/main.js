@@ -7,6 +7,8 @@ const fullscreen = require ('./lib/fullscreen.js');
 const Modal = require('semantic-ui-modal');
 const Transition = require('semantic-ui-transition');
 const  Dimmer = require('semantic-ui-dimmer');
+const geojsonArea = require('@mapbox/geojson-area');
+
 
 $.fn.dimmer = Dimmer;
 $.fn.transition = Transition;
@@ -101,6 +103,14 @@ $(document).ready(function () {
                 return;
             }
             var feature = features[0];
+            if (features.length > 1) {
+              for (var i = 1; i < features.length; i++) {
+                if( geojsonArea.geometry(features[i].geometry) < geojsonArea.geometry(feature.geometry)) {
+                  feature = features[i];
+                }
+              }
+
+            }
 
             $('.ui.modal .header #title').html(feature.properties.title);
             $(".ui.modal .content #description").html(feature.properties.goal);
