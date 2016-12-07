@@ -9,7 +9,6 @@
     "jquery": "^3.1.1",
     "mapbox-gl": "^0.27.0",
     "polylabel": "^1.0.2",
-    "semantic-ui": "^2.2.6",
     "semantic-ui-dimmer": "^2.2.3",
     "semantic-ui-modal": "^2.2.3",
     "semantic-ui-sidebar": "^2.2.3",
