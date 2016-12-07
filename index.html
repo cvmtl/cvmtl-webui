@@ -5,21 +5,60 @@
    <title>Corridors verts</title>
 
    <meta charset=“utf-8” />
-   
-   <script src="bower_components/jquery2/jquery.min.js"></script>
-   <script src="bower_components/leaflet/dist/leaflet.js"></script>
-   <script src="bower_components/cartodb.js/cartodb.js"></script>
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-   <script src="scripts/main.js"></script>   
-   
-   <link rel="stylesheet" href="bower_components/leaflet/dist/leaflet.css">
-   <link rel="stylesheet" href="style/main.css">
+  <link rel="stylesheet" type="text/css" href="style/semantic.min.css">
+  <link href='style/mapbox-gl.css' rel='stylesheet' />
+  <link rel="stylesheet" href="style/main.css">
 
 </head>
 
 <body>
+<style>
 
-<div id="map"></div>
+.mapboxgl-popup {
+    max-width: 400px;
+    font: 12px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
+}
+
+</style>
+<div id="sidebar" class="ui visible left vertical menu sidebar">
+
+<a href="#" id="gofullscreen">&gt;&gt; Plein-Ecran</a>
+
+</div>
+<div id="mapcontainer" class="pusher">
+  <div id="map"></div>
+</div>
+
+<div class="ui small modal">
+  <i class="close icon"></i>
+  <div class="header">
+    <span id='title'></span>
+  </div>
+  <div class="content">
+    <div id='description'>
+    </div>
+    <a id='details-link' href="" target="_blank">
+      <i class='black info icon'></i>
+      détails du projet
+    </a>
+    <br>
+    <a id='facebook-link' href="" target="_blank">
+      <i class='black facebook icon'></i>
+      facebook
+    </a>
+    <a id='website-link' href="" target="_blank">
+      <i class='black external icon'></i>
+      site internet
+    </a>
+
+  </div>
+  <div class="actions">
+  </div>
+</div>
+
+<script src="bundle/build.js"></script>
 
 </body>
 

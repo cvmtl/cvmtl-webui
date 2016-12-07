@@ -1,43 +1,139 @@
+const $ = require('jquery');
+const config = require('./lib/config');
+const polylabel = require ('polylabel');
+const mapboxgl = require('mapbox-gl');
+const mapHelper = require ('./lib/map-helper.js');
+const fullscreen = require ('./lib/fullscreen.js');
+const Modal = require('semantic-ui-modal');
+const Transition = require('semantic-ui-transition');
+const  Dimmer = require('semantic-ui-dimmer');
+
+$.fn.dimmer = Dimmer;
+$.fn.transition = Transition;
+$.fn.modal = Modal;
+
+/**
+ * Sort the projects, such that the 'territories
+ * are first in the list. This is done, to ensure
+ * the smaller areas appear in front of the
+ * larger areas, so hover works as expected.
+ */
+function sortProjects(projects) {
+  projects = projects.sort(function (objA, objB) {
+      if (objA.properties.category && objB.properties.category) {
+          var categoryA = objA.properties.category;
+          var categoryB = objB.properties.category;
+          if (categoryA === 'corridor' && categoryB !== 'corridor') {
+              return 1;
+          } else if (categoryB === 'corridor' && categoryA !== 'corridor') {
+              return -1;
+          }
+      }
+      return 0;
+  });
+  return projects;
+}
+
 $(document).ready(function () {
-    var map = L.map('map').setView([45.5017, -73.5673], 13);
 
-	// create the tile layer with correct attribution
-	var osmUrl='http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
-	var osmAttrib='Map data © <a href="http://openstreetmap.org">OpenStreetMap</a> contributors';
-	var osm = new L.TileLayer(osmUrl, {minZoom: 8, maxZoom: 12, attribution: osmAttrib});
+  mapboxgl.accessToken = config.mapbox.token;
+  var map = new mapboxgl.Map({
+      container: 'map',
+      style: config.mapbox.style,
+     zoom: config.baseZoom,
+     center: [config.centerLat, config.centerLng]
+  });
+  map.addControl(new mapboxgl.NavigationControl(), ['top-left']);
 
-	map.setView(new L.LatLng(45.5017, -73.5673),9);
-	map.addLayer(osm);
+  var getAllUrl = config.apiBaseUrl + "projects?type=geojson";
 
+  map.on('load', function () {
+    var popup = new mapboxgl.Popup({
+        closeButton: false,
+        closeOnClick: false
+    });
+    $.get( getAllUrl, function( items ) {
+      $.get('https://corridorsvertsmtl.org/wp-json/wp/v2/projet', function (projects) {
+        var i;
+        items = sortProjects(items);
+        for (let project of projects){
+          for (let item of items){
+            if (project.acf.shortname == item.properties.shortname){
+              item.properties.title = project.acf['nom'];
+              item.properties.goal = project.acf['objectif'];
+              item.properties.facebook = project.acf['page_facebook'];
+              item.properties.website = project.acf['website'];
+              item.properties.details = project.link;
+            }
+          }
+        }
+        mapHelper.addCorridors(map, items);
 
-// 	var layerUrl = 'http://documentation.carto.com/api/v2/viz/836e37ca-085a-11e4-8834-0edbca4b5057/viz.json';
-//
-//     var vizLayer = cartodb.createLayer(map, layerUrl);
-//     vizLayer.addTo(map)
-//     .on('done', function(layer) {
-//     }).on('error', function() {
-//         console.log(error);
-//     });
-//
-//     var accessToken = 'pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpandmbXliNDBjZWd2M2x6bDk3c2ZtOTkifQ._QA7i5Mpkd_m30IGElHziw';
-//     var mapboxAttribution = 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, ' +
-// 			'<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
-// 			'Imagery © <a href="http://mapbox.com">Mapbox</a>';
-// 	var mapboxUrl = 'https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token='+accessToken;
-//
-//     var grayscale = L.tileLayer(mapboxUrl, {id: 'MapID', attribution: mapboxAttribution});
-//     var streets   = L.tileLayer(mapboxUrl, {id: 'MapID', attribution: mapboxAttribution});
-//
-    var baseMaps = {
-        "Open Street Map": osm,
-//        "Grayscale": grayscale,
-//        "Streets": streets
-    };
+        for (i=0; i < items.length; i++) {
+          const menuId = "item-"+ items[i].properties.id;
+          const relatedId = i;
+          const category = items[i].properties.category;
+          $('.menu').append(
+            `<a class="item ${category}" related="${relatedId}">${items[i].properties.title}</a>`
+            );
+        }
+        $('.item').on('click', function(){
+          var itemId = $(this).attr('related');
+          var item = items[itemId];
+          var p = polylabel(item.geometry.coordinates);
+          map.flyTo({
+              center: p,
+               zoom: 12
+          });
+          mapHelper.hoverCorridor(map, item, popup);
+        });
+        map.on('mousemove', function(e) {
+          var features = map.queryRenderedFeatures(e.point, { layers: ['corridors'] });
+          mapHelper.toggleHoverCorridor(map, features, popup);
+        });
 
-    var overlayMaps = {
-        //"Sample Carto Layer": vizLayer
-    };
+        map.on("mouseout", function() {
+            map.setFilter("corridors-hover", ["==", "title", ""]);
+        });
+        map.on('click', function(e) {
+            var features = map.queryRenderedFeatures(e.point, { layers: ['corridors'] });
+            if (!features.length) {
+                return;
+            }
+            var feature = features[0];
 
-    L.control.layers(baseMaps, overlayMaps).addTo(map);
+            $('.ui.modal .header #title').html(feature.properties.title);
+            $(".ui.modal .content #description").html(feature.properties.goal);
+            $('.ui.modal .content #details-link').attr('href', feature.properties.details);
+            if (typeof(feature.properties.facebook) !== 'undefined' && feature.properties.facebook !='') {
+              $('.ui.modal .content #facebook-link').attr('href', feature.properties.facebook);
+              $('.ui.modal .content #facebook-link').show();
+            }
+            else {
+              $('.ui.modal .content #facebook-link').hide();
+            }
+            if (typeof(feature.properties.website) !== 'undefined' && feature.properties.website !='') {
+              $('.ui.modal .content #website-link').attr('href', feature.properties.website);
+              $('.ui.modal .content #website-link').show();
+            }
+            else {
+              $('.ui.modal .content #website-link').hide();
+            }
+            $('.ui.modal').modal({
+              inverted: true
+            })
+            .modal('show');
+        });
+      }).done(function (items) {
 
+      })
+    }).done(function (items) {
+
+    });
+  });
+
+  fullscreen.initEventHandling();
+  $('#gofullscreen').on('click', function () {
+      fullscreen.toggleFullScreen($('body')[0]);
+  });
 });
