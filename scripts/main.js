@@ -79,6 +79,7 @@ $(document).ready(function () {
             `<a class="item ${category}" related="${relatedId}">${items[i].properties.title}</a>`
             );
         }
+
         $('.item').on('click', function(){
           var itemId = $(this).attr('related');
           var item = items[itemId];
@@ -89,6 +90,13 @@ $(document).ready(function () {
           });
           mapHelper.hoverCorridor(map, item, popup);
         });
+
+        $('.item').on('mouseover', function(){
+          var itemId = $(this).attr('related');
+          var item = items[itemId];
+          mapHelper.hoverCorridor(map, item, popup);
+        });
+
         map.on('mousemove', function(e) {
           var features = map.queryRenderedFeatures(e.point, { layers: ['corridors'] });
           mapHelper.toggleHoverCorridor(map, features, popup);
