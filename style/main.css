@@ -4,6 +4,8 @@
     right: 0;
     top: 0;
     bottom: 0;
+    height: 100%;
+    width: 100%;
 }
 
 #mapcontainer {
@@ -12,12 +14,17 @@
     top: 0;
     bottom: 0;
     left: 260px;
+    height: 100%;
 }
 
 body .ui.visible.left.sidebar~.fixed,
 body .ui.visible.left.sidebar~.pusher {
    -webkit-transform: translate3d(0,0,0);
    transform: translate3d(0,0,0);
+}
+
+.dimmable:not(.body) {
+    position: inherit;
 }
 
 .fullscreen #gofullscreen {
