@@ -1,4 +1,50 @@
+const $ = require('jquery');
 const polylabel = require ('polylabel');
+const layerConfig = require ('./layerConfig');
+export function addStaticLayers(map) {
+  console.log('version 13');
+  for(var i = 0; i < layerConfig.baseLayers.length; i++) {
+    var layer = layerConfig.baseLayers[i];
+    map.addSource(
+      layer.shortname,
+      {
+        'type': 'vector',
+        'url': 'mapbox://' + 'cvmtl.' + layer.id
+      }
+    );
+
+    map.addLayer({
+      'id': layer.shortname,
+      'type': 'fill',
+      'source':  layer.shortname,
+      'source-layer': layer.sourceLayer,
+      'layout': {
+          'visibility': 'none'
+      },
+      'paint': {
+          'fill-color': layer.color,
+          'fill-opacity': layer.opacity
+      }
+    });
+    $('#menu').append(
+      `<a class="layerItem" related="${i}">${layer.name}</a>`
+      );
+  }
+  $('.layerItem').on('click', function(){
+    var itemId = $(this).attr('related');
+    var layerItem = layerConfig.baseLayers[itemId];
+    var visibility = map.getLayoutProperty(layerItem.shortname, 'visibility');
+
+    if (visibility === 'visible') {
+        map.setLayoutProperty(layerItem.shortname, 'visibility', 'none');
+        this.className = '';
+    } else {
+        this.className = 'active';
+        map.setLayoutProperty(layerItem.shortname, 'visibility', 'visible');
+    }
+  });
+
+}
 export function addCorridors(map, items) {
 
   var featureCollection = {

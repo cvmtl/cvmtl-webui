@@ -7,10 +7,25 @@ const fullscreen = require ('./lib/fullscreen.js');
 const Modal = require('semantic-ui-modal');
 const Transition = require('semantic-ui-transition');
 const  Dimmer = require('semantic-ui-dimmer');
+const geojsonArea = require('@mapbox/geojson-area');
+
 
 $.fn.dimmer = Dimmer;
 $.fn.transition = Transition;
 $.fn.modal = Modal;
+
+
+
+function toggleLayerMenu(){
+  if ($('#menu').hasClass('visible')){
+    $('#menu').removeClass('visible');
+    $('#menu').hide();
+  }
+  else {
+    $('#menu').addClass('visible');
+    $('#menu').show();
+  }
+}
 
 /**
  * Sort the projects, such that the 'territories
@@ -36,6 +51,10 @@ function sortProjects(projects) {
 
 $(document).ready(function () {
 
+  $('#menu').hide();
+  $("#layer-icon").on('click',function () {
+    toggleLayerMenu();
+  })
   mapboxgl.accessToken = config.mapbox.token;
   var map = new mapboxgl.Map({
       container: 'map',
@@ -48,6 +67,7 @@ $(document).ready(function () {
   var getAllUrl = config.apiBaseUrl + "projects?type=geojson";
 
   map.on('load', function () {
+    mapHelper.addStaticLayers(map);
     var popup = new mapboxgl.Popup({
         closeButton: false,
         closeOnClick: false
@@ -77,6 +97,7 @@ $(document).ready(function () {
             `<a class="item ${category}" related="${relatedId}">${items[i].properties.title}</a>`
             );
         }
+
         $('.item').on('click', function(){
           var itemId = $(this).attr('related');
           var item = items[itemId];
@@ -87,6 +108,13 @@ $(document).ready(function () {
           });
           mapHelper.hoverCorridor(map, item, popup);
         });
+
+        $('.item').on('mouseover', function(){
+          var itemId = $(this).attr('related');
+          var item = items[itemId];
+          mapHelper.hoverCorridor(map, item, popup);
+        });
+
         map.on('mousemove', function(e) {
           var features = map.queryRenderedFeatures(e.point, { layers: ['corridors'] });
           mapHelper.toggleHoverCorridor(map, features, popup);
@@ -101,6 +129,14 @@ $(document).ready(function () {
                 return;
             }
             var feature = features[0];
+            if (features.length > 1) {
+              for (var i = 1; i < features.length; i++) {
+                if( geojsonArea.geometry(features[i].geometry) < geojsonArea.geometry(feature.geometry)) {
+                  feature = features[i];
+                }
+              }
+
+            }
 
             $('.ui.modal .header #title').html(feature.properties.title);
             $(".ui.modal .content #description").html(feature.properties.goal);
