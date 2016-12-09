@@ -11,12 +11,12 @@ Installation
 
 To install the project:
 
-   npm install
-   gulp build
+    npm install
+    gulp build
 
 If you don't have gulp installed, then it can be installed via:
 
-   npm install -g gulp
+    npm install -g gulp
    
 Known Limitations
 -----------------
