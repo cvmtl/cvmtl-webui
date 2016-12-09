@@ -14,6 +14,19 @@ $.fn.dimmer = Dimmer;
 $.fn.transition = Transition;
 $.fn.modal = Modal;
 
+
+
+function toggleLayerMenu(){
+  if ($('#menu').hasClass('visible')){
+    $('#menu').removeClass('visible');
+    $('#menu').hide();
+  }
+  else {
+    $('#menu').addClass('visible');
+    $('#menu').show();
+  }
+}
+
 /**
  * Sort the projects, such that the 'territories
  * are first in the list. This is done, to ensure
@@ -38,6 +51,10 @@ function sortProjects(projects) {
 
 $(document).ready(function () {
 
+  $('#menu').hide();
+  $("#layer-icon").on('click',function () {
+    toggleLayerMenu();
+  })
   mapboxgl.accessToken = config.mapbox.token;
   var map = new mapboxgl.Map({
       container: 'map',
@@ -50,6 +67,7 @@ $(document).ready(function () {
   var getAllUrl = config.apiBaseUrl + "projects?type=geojson";
 
   map.on('load', function () {
+    mapHelper.addStaticLayers(map);
     var popup = new mapboxgl.Popup({
         closeButton: false,
         closeOnClick: false
@@ -79,6 +97,7 @@ $(document).ready(function () {
             `<a class="item ${category}" related="${relatedId}">${items[i].properties.title}</a>`
             );
         }
+
         $('.item').on('click', function(){
           var itemId = $(this).attr('related');
           var item = items[itemId];
@@ -89,6 +108,13 @@ $(document).ready(function () {
           });
           mapHelper.hoverCorridor(map, item, popup);
         });
+
+        $('.item').on('mouseover', function(){
+          var itemId = $(this).attr('related');
+          var item = items[itemId];
+          mapHelper.hoverCorridor(map, item, popup);
+        });
+
         map.on('mousemove', function(e) {
           var features = map.queryRenderedFeatures(e.point, { layers: ['corridors'] });
           mapHelper.toggleHoverCorridor(map, features, popup);
