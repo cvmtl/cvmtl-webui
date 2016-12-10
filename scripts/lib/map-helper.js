@@ -79,7 +79,7 @@ export function addCorridors(map, items) {
     "layout": {},
     "paint": {
          "line-color": "#053e0e",
-         "line-width": 1
+         "line-width": 2 
      }
   });
 
