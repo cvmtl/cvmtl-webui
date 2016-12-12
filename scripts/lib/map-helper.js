@@ -1,10 +1,35 @@
 const $ = require('jquery');
 const polylabel = require ('polylabel');
-const layerConfig = require ('./layerConfig');
+const config = require ('./config');
+
+const defaultThemeName = 'dark';
+
+export function queryFromUrl() {
+    var queries = {};
+      $.each(document.location.search.substr(1).split('&'),function(c,q){
+        var i = q.split('=');
+        queries[i[0].toString()] = i[1].toString();
+    });
+
+    return queries;
+}
+
+export function getActiveTheme() {
+  var themeName = defaultThemeName;
+  const query = queryFromUrl();
+  if (query.theme) {
+     themeName = query.theme;
+  }
+  return config.getTheme(themeName);
+}
+
 export function addStaticLayers(map) {
+  const theme = getActiveTheme();
+  const baseLayers = theme.baseLayers;
+
   console.log('version 13');
-  for(var i = 0; i < layerConfig.baseLayers.length; i++) {
-    var layer = layerConfig.baseLayers[i];
+  for(var i = 0; i < baseLayers.length; i++) {
+    var layer = baseLayers[i];
     map.addSource(
       layer.shortname,
       {
@@ -30,9 +55,10 @@ export function addStaticLayers(map) {
       `<a class="layerItem" related="${i}">${layer.name}</a>`
       );
   }
+
   $('.layerItem').on('click', function(){
     var itemId = $(this).attr('related');
-    var layerItem = layerConfig.baseLayers[itemId];
+    var layerItem = baseLayers[itemId];
     var visibility = map.getLayoutProperty(layerItem.shortname, 'visibility');
 
     if (visibility === 'visible') {
@@ -43,9 +69,10 @@ export function addStaticLayers(map) {
         map.setLayoutProperty(layerItem.shortname, 'visibility', 'visible');
     }
   });
-
 }
+
 export function addCorridors(map, items) {
+  const theme = getActiveTheme();
 
   var featureCollection = {
     "type": "FeatureCollection",
@@ -77,10 +104,7 @@ export function addCorridors(map, items) {
     'type': "line",
     'source': "corridors",
     "layout": {},
-    "paint": {
-         "line-color": "#053e0e",
-         "line-width": 2 
-     }
+    "paint": theme.corridorsLine
   });
 
   map.addLayer({
@@ -88,12 +112,7 @@ export function addCorridors(map, items) {
     'type': 'fill',
     'source': "corridors",
     "layout": {},
-    'paint': {
-        'fill-color': '#367133',
-        'fill-outline-color': 'black',
-        'fill-opacity': 0.2
-
-    },
+    'paint': theme.corridorsFill,
     "filter": ["==", "title", ""]
   });
 

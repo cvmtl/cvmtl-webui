@@ -50,7 +50,16 @@ function sortProjects(projects) {
     return projects;
 }
 
+
+
 $(document).ready(function() {
+    var themeName = 'dark';
+
+    var queries = mapHelper.queryFromUrl();
+
+    if (queries.theme) {
+        themeName = queries.theme;
+    }
 
     $('#menu').hide();
     $("#layer-icon").on('click', function() {
@@ -59,7 +68,7 @@ $(document).ready(function() {
     mapboxgl.accessToken = config.mapbox.token;
     var map = new mapboxgl.Map({
         container: 'map',
-        style: config.mapbox.style,
+        style: config.getTheme(themeName).style,
         zoom: config.baseZoom,
         center: [config.centerLat, config.centerLng]
     });
