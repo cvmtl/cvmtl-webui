@@ -4,6 +4,7 @@ const polylabel = require('polylabel');
 const mapboxgl = require('mapbox-gl');
 const mapHelper = require('./lib/map-helper.js');
 const fullscreen = require('./lib/fullscreen.js');
+const ruelles_geojson = require('./lib/chatsderuelles.js');
 const Modal = require('semantic-ui-modal');
 const Transition = require('semantic-ui-transition');
 const Dimmer = require('semantic-ui-dimmer');
@@ -77,7 +78,27 @@ $(document).ready(function() {
     var getAllUrl = config.apiBaseUrl + "projects?type=geojson";
 
     map.on('load', function() {
+
         mapHelper.addStaticLayers(map);
+
+        ruelles_geojson.data.features.forEach(function(marker) {
+        //   // create a DOM element for the marker
+        console.log(marker);
+          var el = document.createElement('div');
+          el.className = 'marker';
+          el.style.backgroundImage = 'url(cdr120.png)';
+          el.style.width = '120px';
+          el.style.height = '120px';
+
+          // el.addEventListener('click', function() {
+          //     // window.alert('toto');
+          // });
+
+            // add marker to map
+            new mapboxgl.Marker(el)
+                .setLngLat([marker.geometry.coordinates[0],marker.geometry.coordinates[1]])
+                .addTo(map);
+        });
         var popup = new mapboxgl.Popup({
             closeButton: false,
             closeOnClick: false
